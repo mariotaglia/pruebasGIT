@@ -51,6 +51,11 @@ sigmar = 0.0 ! random sigma
 ! Check validity of input
 !
 
+hguess = ndi
+spiral = ndi
+nspiral = ndi
+vscan = ndi
+potential = ndi
 scx = ndi
 scy = ndi
 scz = ndi
@@ -77,10 +82,11 @@ dy = ndr
 dz = ndr
 cdiva = ndr
 csalt = ndr
-vpol0 = ndr
+rpol = ndr
 vsol0 = ndr
 gama0 = ndr
 benergy = ndr
+lambda = ndr
 
 nsc = 1
 scs(1) = 1.0
@@ -238,7 +244,6 @@ do while (ios == 0)
    read(buffer, *, iostat=ios) lseg
    if(rank.eq.0)write(stdout,*) 'parser:','Set ',trim(label),' = ',trim(buffer)
 
-
  case ('dielP')
    read(buffer, *, iostat=ios) dielP
    if(rank.eq.0)write(stdout,*) 'parser:','Set ',trim(label),' = ',trim(buffer)
@@ -259,9 +264,20 @@ do while (ios == 0)
    read(buffer, *, iostat=ios) benergy
    if(rank.eq.0)write(stdout,*) 'parser:','Set ',trim(label),' = ',trim(buffer)
 
+ case ('rpol')
+   read(buffer, *, iostat=ios) rpol
+   if(rank.eq.0)write(stdout,*) 'parser:','Set ',trim(label),' = ',trim(buffer)
 
- case ('vpol')
-   read(buffer, *, iostat=ios) vpol0
+ case ('vscan')
+   read(buffer, *, iostat=ios) vscan
+   if(rank.eq.0)write(stdout,*) 'parser:','Set ',trim(label),' = ',trim(buffer)
+
+ case ('potential')
+   read(buffer, *, iostat=ios) potential
+   if(rank.eq.0)write(stdout,*) 'parser:','Set ',trim(label),' = ',trim(buffer)
+
+ case ('lambda')
+   read(buffer, *, iostat=ios) lambda
    if(rank.eq.0)write(stdout,*) 'parser:','Set ',trim(label),' = ',trim(buffer)
 
  case ('sigmar')
@@ -283,6 +299,26 @@ do while (ios == 0)
 
  case ('hguess')
    read(buffer, *, iostat=ios) hguess
+   if(rank.eq.0)write(stdout,*) 'parser:','Set ',trim(label),' = ',trim(buffer)
+
+ case ('spiral')
+   read(buffer, *, iostat=ios) spiral
+   if(rank.eq.0)write(stdout,*) 'parser:','Set ',trim(label),' = ',trim(buffer)
+
+ case ('nspiral')
+   read(buffer, *, iostat=ios) nspiral
+   if(rank.eq.0)write(stdout,*) 'parser:','Set ',trim(label),' = ',trim(buffer)
+
+ case ('zrange')
+   read(buffer, *, iostat=ios) zrange
+   if(rank.eq.0)write(stdout,*) 'parser:','Set ',trim(label),' = ',trim(buffer)
+
+ case ('nzmin')
+   read(buffer, *, iostat=ios) nzmin
+   if(rank.eq.0)write(stdout,*) 'parser:','Set ',trim(label),' = ',trim(buffer)
+
+ case ('nzmax')
+   read(buffer, *, iostat=ios) nzmax
    if(rank.eq.0)write(stdout,*) 'parser:','Set ',trim(label),' = ',trim(buffer)
 
  case ('hring')
@@ -309,6 +345,21 @@ do while (ios == 0)
    read(fh,*)sts(i)
    enddo 
 
+ case ('npH')
+   read(buffer, *, iostat=ios) npH
+   if(rank.eq.0)write(stdout,*) 'parser:','Set ',trim(label),' = ',trim(buffer)
+
+   do i = 1, npH
+   read(fh,*)pHs(i)
+   enddo
+
+ case ('neflow')
+   read(buffer, *, iostat=ios) neflow
+   if(rank.eq.0)write(stdout,*) 'parser:','Set ',trim(label),' = ',trim(buffer)
+
+   do i = 1, neflow
+   read(fh,*)eflows(i)
+   enddo
 
  case ('nsc')
    read(buffer, *, iostat=ios) nsc
@@ -352,7 +403,31 @@ do while (ios == 0)
      read(fh, *) echargec
      read(fh, *) basura
      read(fh, *) eepsc
+ 
+    case(42, 52)
+     read(fh, *) basura
+     read(fh, *) rchannel
+     read(fh, *) basura
+     read(fh, *) RdimZ
+     read(fh, *) basura
+     read(fh, *) NBRUSH ! number of brushes in the tetha direction
+     read(fh, *) basura
+     read(fh, *) gspacer ! grafting point distance unit (nm)
+     read(fh, *) basura
+     read(fh, *) Nrings
 
+     allocate (ringpos(Nrings))
+
+     read(fh, *) basura
+     do i = 1, Nrings
+       read(fh, *) ringpos(i)
+     enddo
+      ringpos = ringpos - 0.5
+    
+     read(fh, *) basura
+     read(fh, *) echargec
+     read(fh, *) basura
+     read(fh, *) eepsc
 
     case(1) 
      read(fh, *) basura

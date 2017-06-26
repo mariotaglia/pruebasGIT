@@ -16,13 +16,14 @@ use ellipsoid
 use transform
 use kaist
 use mparameters_monomer
+use channel
 implicit none
 
 integer*4 ier2
 integer ncells
 real*8 x(*),f(*)
 real*8 protemp
-integer i,j, ix, iy, iz, ii, ax, ay, az
+integer i,j, ix, iy, iz, ii, ax, ay, az, az_nopbc, rfactor
 integer im, ip
 integer jx, jy, jz, jj
 real*8 xpot(dimx, dimy, dimz, N_monomer)
@@ -33,6 +34,8 @@ real*8 MVV,MUU,MWW,MVU,MVW,MUW
 real*8 psivv,psiuu,psiww, psivu,psivw,psiuw
 real*8 psiv(3), epsv(3)
 real*8 xtotalsum(dimx,dimy,dimz)
+
+real*8 local_eflow
 
 integer, external :: PBCSYMI, PBCREFI
 
@@ -49,12 +52,18 @@ real*8 gradpsi2
 real*8 fv
 
 ! hamiltonian inception
-real*8 hfactor, hd, hd0, hd1, hd2, hd3, hd4, hd5, hd6
+real*8 hfactor, hd, hx, hy, hz, hr, ht1, ht2, ht
+real*8, allocatable :: hds(:)
+real*8, allocatable :: hds2(:,:)
+ALLOCATE(hds(1000))
+ALLOCATE(hds2(100,100))
+hds = -1
+hds2 = -1
 
 !-----------------------------------------------------
 ! Common variables
 
-shift = 1.0d-200
+shift = 1.0d-100
 
 ncells = dimx*dimy*dimz ! numero de celdas
 
@@ -221,106 +230,62 @@ do ix=1,dimx
  do iy=1,dimy
    do iz=1,dimz
 
-     select case (hguess)
+   if(spiral .eq. 0) then 
+     if(hguess .eq. 0) then
 
-     case (0) !ring
-
-      hd0 = sqrt(float((2*ix-dimx)**2+(2*iy-dimy)**2))/2.0*delta
-      hd0 = hd0**2+(oval*float(2*iz-dimz)/2.0*delta)**2
-
-      hd = hd0
+      hd = sqrt(float((2*ix-dimx)**2+(2*iy-dimy)**2))/2.0*delta
+      hd = hd**2+(oval*float(2*iz-dimz)/2.0*delta)**2
       hfactor = dexp(-(kp**2)*hd)
 
-     case (1) !ring
+     elseif(hguess .eq. 1) then
 
-      hd1 = sqrt(float((2*ix-dimx)**2+(2*iy-dimy)**2))/2.0*delta-hring
-      hd1 = hd1**2+(oval*float(2*iz-dimz)/2.0*delta)**2
-
-      hd = hd1
+      hd = sqrt(float((2*ix-dimx)**2+(2*iy-dimy)**2))/2.0*delta-hring
+      hd = hd**2+(oval*float(2*iz-dimz)/2.0*delta)**2
       hfactor = dexp(-(kp**2)*hd)
 
-!      hfactor = dexp(-(kp**2)*hd1)
-!      hfactor=hfactor/1
+     else
 
-     case (2) !two clusters
-
-      hd1 = sqrt((float(2*ix-dimx)-2*hring/delta)**2+float(2*iy-dimy)**2)/2.0*delta
-      hd1 = hd1**2+(oval*float(2*iz-dimz)/2.0*delta)**2
-
-      hd2 = sqrt((float(2*ix-dimx)+2*hring/delta)**2+float(2*iy-dimy)**2)/2.0*delta
-      hd2 = hd2**2+(oval*float(2*iz-dimz)/2.0*delta)**2
-
-      hd = min(hd1,hd2)
+      do i=1,hguess
+       hds(i) = (float(2*ix-dimx)-2*cos(i*2*pi/hguess)*hring/delta)**2+(float(2*iy-dimy)-2*sin(i*2*pi/hguess)*hring/delta)**2
+       hds(i) = hds(i)/4.0*(delta**2)+(oval*float(2*iz-dimz)/2.0*delta)**2
+      end do
+      hd = minval(hds, mask = hds .gt.0)
       hfactor = dexp(-(kp**2)*hd)
 
-!      hfactor = dexp(-(kp**2)*hd1) + dexp(-(kp**2)*hd2)
-!      hfactor=hfactor/2
+     endif
+   endif
 
-     case (3) !two clusters
+   if(spiral .eq. 1) then
 
-      hd1 = sqrt((float(2*ix-dimx)-2*hring/delta)**2+float(2*iy-dimy)**2)/2.0*delta
-      hd1 = hd1**2+(oval*float(2*iz-dimz)/2.0*delta)**2
+      do i=nzmin,nzmax
+        do j=1,nspiral
+!          hx=2*cos(hguess*i*2*pi/zrange/nspiral+j*2*pi/nspiral)*hring/delta
+!          hy=2*sin(hguess*i*2*pi/zrange/nspiral+j*2*pi/nspiral)*hring/delta
+!          hz=(i-0.5)*dimz/zrange
+!          hx=min((float(2*ix-3*dimx)-hx)**2,(float(2*ix-dimx)-hx)**2,(float(2*ix+dimx)-hx)**2)
+!          hy=min((float(2*iy-3*dimy)-hy)**2,(float(2*iy-dimy)-hy)**2,(float(2*iy+dimy)-hy)**2)
+!          hz=min((iz-hz)**2,(iz-dimz-hz)**2,(iz+dimz-hz)**2)
+!          hds2(i,j)=(hx+hy+4*(oval**2)*hz)/4.0*(delta**2)
 
-      hd2 = sqrt((float(2*ix-dimx)+2*0.5*hring/delta)**2+(float(2*iy-dimy)-2*0.87*hring/delta)**2)/2.0*delta
-      hd2 = hd2**2+(oval*float(2*iz-dimz)/2.0*delta)**2
+!          hr=sqrt((float(2*ix-dimx)**2+float(2*iy-dimy)**2)/4*(delta**2))
+!          hr=(hr-hring)**2
+!          ht1=hguess*i*2*pi/zrange/nspiral+j*2*pi/nspiral
+!          ht2=atan(float(2*ix-dimx)/float(2*iy-dimy))
+!          ht=min((ht1-ht2)**2,(2*pi-abs(ht1-ht2))**2)*(hring**2)
+!          hz=(i-0.5)*dimz/zrange
+!          hz=min((iz-hz)**2,(iz-dimz-hz)**2,(iz+dimz-hz)**2)*(oval**2)*(delta**2)
+!          hds2(i,j)=hr+ht+hz
 
-      hd3 = sqrt((float(2*ix-dimx)+2*0.5*hring/delta)**2+(float(2*iy-dimy)+2*0.87*hring/delta)**2)/2.0*delta
-      hd3 = hd3**2+(oval*float(2*iz-dimz)/2.0*delta)**2
-
-      hd = min(hd1,hd2,hd3)
+          hds2(i,j)=min((iz-(i-0.5)*dimz/zrange)**2,(iz-dimz-(i-0.5)*dimz/zrange)**2,(iz+dimz-(i-0.5)*dimz/zrange)**2)
+          hds2(i,j)=4*(oval**2)*hds2(i,j)+(float(2*ix-dimx)-2*cos(hguess*i*2*pi/zrange/nspiral+j*2*pi/nspiral)*hring/delta)**2
+          hds2(i,j)=hds2(i,j)+(float(2*iy-dimy)-2*sin(hguess*i*2*pi/zrange/nspiral+j*2*pi/nspiral)*hring/delta)**2
+          hds2(i,j)=hds2(i,j)/4.0*(delta**2)
+        end do
+      end do
+      hd = minval(hds2, mask = hds2 .gt.0)
       hfactor = dexp(-(kp**2)*hd)
 
-!      hfactor = dexp(-(kp**2)*hd1) + dexp(-(kp**2)*hd2) + dexp(-(kp**2)*hd3)
-!      hfactor=hfactor/3
-
-     case (4) !two clusters
-
-      hd1 = sqrt((float(2*ix-dimx)-2*hring/delta)**2+float(2*iy-dimy)**2)/2.0*delta
-      hd1 = hd1**2+(oval*float(2*iz-dimz)/2.0*delta)**2
-
-      hd2 = sqrt((float(2*ix-dimx)+2*hring/delta)**2+float(2*iy-dimy)**2)/2.0*delta
-      hd2 = hd2**2+(oval*float(2*iz-dimz)/2.0*delta)**2
-
-      hd3 = sqrt((float(2*iy-dimy)-2*hring/delta)**2+float(2*ix-dimx)**2)/2.0*delta
-      hd3 = hd3**2+(oval*float(2*iz-dimz)/2.0*delta)**2
-
-      hd4 = sqrt((float(2*iy-dimy)+2*hring/delta)**2+float(2*ix-dimx)**2)/2.0*delta
-      hd4 = hd4**2+(oval*float(2*iz-dimz)/2.0*delta)**2
-
-      hd = min(hd1,hd2,hd3,hd4)
-      hfactor = dexp(-(kp**2)*hd)
-
-!      hfactor = dexp(-(kp**2)*hd1) + dexp(-(kp**2)*hd2) + dexp(-(kp**2)*hd3) + dexp(-(kp**2)*hd4)
-!      hfactor=hfactor/4
-
-     case (6) !two clusters
-
-      hd1 = sqrt((float(2*ix-dimx)-2*hring/delta)**2+float(2*iy-dimy)**2)/2.0*delta
-      hd1 = hd1**2+(oval*float(2*iz-dimz)/2.0*delta)**2
-
-      hd2 = sqrt((float(2*ix-dimx)+2*0.5*hring/delta)**2+(float(2*iy-dimy)-2*0.87*hring/delta)**2)/2.0*delta
-      hd2 = hd2**2+(oval*float(2*iz-dimz)/2.0*delta)**2
-
-      hd3 = sqrt((float(2*ix-dimx)+2*0.5*hring/delta)**2+(float(2*iy-dimy)+2*0.87*hring/delta)**2)/2.0*delta
-      hd3 = hd3**2+(oval*float(2*iz-dimz)/2.0*delta)**2
-
-      hd4 = sqrt((float(2*ix-dimx)+2*hring/delta)**2+float(2*iy-dimy)**2)/2.0*delta
-      hd4 = hd4**2+(oval*float(2*iz-dimz)/2.0*delta)**2
-
-      hd5 = sqrt((float(2*ix-dimx)-2*0.5*hring/delta)**2+(float(2*iy-dimy)-2*0.87*hring/delta)**2)/2.0*delta
-      hd5 = hd5**2+(oval*float(2*iz-dimz)/2.0*delta)**2
-
-      hd6 = sqrt((float(2*ix-dimx)-2*0.5*hring/delta)**2+(float(2*iy-dimy)+2*0.87*hring/delta)**2)/2.0*delta
-      hd6 = hd6**2+(oval*float(2*iz-dimz)/2.0*delta)**2
-
-      hd = min(hd1,hd2,hd3,hd4,hd5,hd6)
-      hfactor = dexp(-(kp**2)*hd)
-
-!      hfactor=dexp(-(kp**2)*hd1)+dexp(-(kp**2)*hd2)+dexp(-(kp**2)*hd3)+dexp(-(kp**2)*hd4)+dexp(-(kp**2)*hd5)+dexp(-(kp**2)*hd6)
-!      hfactor=hfactor/6
-
-     endselect
-
+   endif
 
      fv = (1.0 - volprot(ix,iy,iz))
      xpot(ix, iy, iz, im) = xh(ix,iy,iz)**vpol
@@ -430,8 +395,25 @@ do jj = 1, cpp(rank+1)
    do j=1,long
     ax = px(i, j, jj) ! cada uno para su cadena...
     ay = py(i, j, jj)
-    az = pz(i, j, jj)         
-    pro(i, jj) = pro(i, jj) * xpot(ax, ay, az, segtype(j))
+    az = pz(i, j, jj)
+    if((vscan.eq.3).and.(j.gt.1)) then
+      if(pz(i, j, jj)-pz(i, j-1, jj).gt.(0.4*dimz)) then
+        az_nopbc = pz(i, j, jj)-dimz
+      elseif(pz(i, j, jj)-pz(i, j-1, jj).lt.(-0.4*dimz)) then
+        az_nopbc = pz(i, j, jj)+dimz
+      else
+        az_nopbc = pz(i, j, jj)
+      endif
+      if(abs(az_nopbc - pz(i, j-1, jj)).gt.2) then
+        write(stdout,*)'discontinuous polymer'
+        stop
+      endif
+      rfactor = ((ax-0.5*dimx)**2+(ay-0.5*dimy)**2)/(4*rchannel**2)
+      local_eflow =exp(eflow*(1-rfactor)*(az_nopbc - pz(i, j-1, jj)))
+    else
+      local_eflow = 1
+    endif
+    pro(i, jj) = pro(i, jj) * xpot(ax, ay, az, segtype(j)) * local_eflow
    enddo
     pro(i,jj) = pro(i,jj)*exp(-benergy*ngauche(i,ii)) ! energy of gauche bonds
 

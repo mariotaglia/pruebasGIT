@@ -2,6 +2,7 @@ subroutine monomer_definitions
 
 use MPI
 use mparameters_monomer
+use system
 
 implicit none
 integer i
@@ -25,10 +26,23 @@ zpol(i) = 0
 hydroph(i) = 0
 pKa(i) = 11.0
 
+!select case (vscan)
+
+!case(1)
+
+!i = 2
+!zpol(i) = -1
+!hydroph(i) = 1
+!pKa(i) = 5.0
+
+!case(2)
+
 i = 2
 zpol(i) = 0
 hydroph(i) = 1
 pKa(i) = 11.0
+
+!endselect
 
 !! Segment type 2 for NPC, negative , hydrophilic
 !

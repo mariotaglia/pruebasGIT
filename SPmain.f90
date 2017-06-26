@@ -8,6 +8,9 @@ use const
 use montecarlo
 use ematrix
 use kaist
+use inputtemp
+use mparameters_monomer
+use chainsdat
 
 implicit none
 integer counter, counterr
@@ -22,9 +25,10 @@ real*8 theta
 real*8, external :: rands
 logical flag
 character*10 filename
+character*4 vname
 integer j, i, ii, iii
 integer flagcrash
-real*8 stOK
+real*8 stOK,kpOK,pHOK,eflowOK
 
 stdout = 6
 
@@ -81,6 +85,10 @@ elseif (systemtype.eq.4) then
 call update_matrix_channel_4(flag) ! updates 'the matrix'
 elseif (systemtype.eq.41) then
 call update_matrix_channel_4(flag) ! updates 'the matrix'
+elseif (systemtype.eq.42) then
+call update_matrix_channel_4(flag) ! updates 'the matrix'
+elseif (systemtype.eq.52) then
+call update_matrix_channel_4(flag) ! updates 'the matrix'
 endif
 
   if(flag.eqv..true.) then
@@ -114,47 +122,174 @@ endif
  ii = 1
  sc = scs(ii)
 
+!select case (vscan)
+
+!do i=1,8
+  if(rank.eq.0)write(stdout,*)'number of survived comformations = ', newcuantas(:)
+!end do
+
+!case (1)
+
+vname = 'HIkp'
+
+st = sts(1)
+eflow = 0
+
 kp = 1.0d10+kps(1)
-do j = 1, nkp
-do while (kp.ne.kps(j))
-  kp = kps(j)
+do i = 1, nkp
+ do while (kp.ne.kps(i))
+  kp = kps(i)
   if(rank.eq.0)write(stdout,*)'Switch to kp = ', kp
+  flagcrash = 1
+  do while(flagcrash.eq.1)
+   flagcrash = 0
+   if(kp.gt.0.0001) then
+     ftol=1.0d-3
+   else
+     ftol=1.0d-5
+   endif
+   call solve(flagcrash)
+   if(flagcrash.eq.1) then
+    if(i.eq.1)stop
+    kp = (kp + kpOK)/2.0
+    if(rank.eq.0)write(stdout,*)'Error, switch to kp = ', kp
+   endif
+  enddo
+
+  kpOK = kp ! last st solved OK
+  if(rank.eq.0)write(stdout,*) 'Solved OK, kp: ', kpOK
  
-  st = 1.0d10+sts(1)
-  do i = 1, nst
-  do while (st.ne.sts(i))
-   st = sts(i)
-   if(rank.eq.0)write(stdout,*)'Switch to st = ', st
-   flagcrash = 1
+ enddo
+
+ counterr = counter + i + ii  - 1
+ call Free_Energy_Calc(vname,kp)
+ if(rank.eq.0)write(stdout,*) 'Free energy after solving', free_energy
+ call savedata(1)
+ if(rank.eq.0)write(stdout,*) 'Save OK'
+ call store2disk(vname,kp)
+
+enddo
+
+select case (vscan)
+
+case (1)
+
+zpol(2) = -1
+hydroph(2) = 1
+pKa(2) = 5.0
+
+vname = 'pHbk'
+counter = 0
+ftol=1.0d-5
+
+kp = 0
+pHbulk = 1.0d10+pHs(1)
+do i = 1, npH
+ do while (pHbulk.ne.pHs(i))
+  pHbulk = pHs(i)
+  if(rank.eq.0)write(stdout,*)'Switch to pH = ', pHbulk
+  flagcrash = 1
+  do while(flagcrash.eq.1)
+   call initall
+   flagcrash = 0
+   call solve(flagcrash)
+   if(flagcrash.eq.1) then
+    if(i.eq.1)stop
+    pHbulk = (pHbulk + pHOK)/2.0
+    if(rank.eq.0)write(stdout,*)'Error, switch to pH = ', pHbulk
+   endif
+  enddo
+
+  pHOK = pHbulk ! last st solved OK
+  if(rank.eq.0)write(stdout,*) 'Solved OK, pH: ', pHOK
+
+ enddo
+
+ counterr = counter + i + ii  - 1
+ call Free_Energy_Calc(vname,pHbulk)
+ if(rank.eq.0)write(stdout,*) 'Free energy after solving', free_energy
+ call savedata(counterr)
+ if(rank.eq.0)write(stdout,*) 'Save OK'
+ call store2disk(vname,pHbulk)
+
+enddo
+
+case (2)
+
+vname = 'hpho'
+counter = 0
+ftol=1.0d-5
+
+kp = 0
+st = 1.0d10+sts(1)
+do i = 1, nst
+ do while (st.ne.sts(i))
+  st = sts(i)
+  if(rank.eq.0)write(stdout,*)'Switch to st = ', st
+  flagcrash = 1
   do while(flagcrash.eq.1)
    flagcrash = 0
    call solve(flagcrash)
    if(flagcrash.eq.1) then
-      if(i.eq.1)stop
-      st = (st + stOK)/2.0
-   if(rank.eq.0)write(stdout,*)'Error, switch to st = ', st
+    if(i.eq.1)stop
+    st = (st + stOK)/2.0
+    if(rank.eq.0)write(stdout,*)'Error, switch to st = ', st
    endif
   enddo
 
-   stOK = st ! last st solved OK
-   if(rank.eq.0)write(stdout,*) 'Solved OK, st: ', stOK
- 
+  stOK = st ! last st solved OK
+  if(rank.eq.0)write(stdout,*) 'Solved OK, st: ', stOK
 
-  enddo
+ enddo
 
-
-
-   counterr = counter + j + ii  - 1
-   call Free_Energy_Calc(counterr)
-   if(rank.eq.0)write(stdout,*) 'Free energy after solving', free_energy
-   call savedata(counterr)
-   if(rank.eq.0)write(stdout,*) 'Save OK'
-   call store2disk(counterr)
-
-  enddo
+ counterr = counter + i + ii  - 1
+ call Free_Energy_Calc(vname,st)
+ if(rank.eq.0)write(stdout,*) 'Free energy after solving', free_energy
+ call savedata(counterr)
+ if(rank.eq.0)write(stdout,*) 'Save OK'
+ call store2disk(vname,st)
 
 enddo
+
+case (3)
+
+vname = 'flow'
+counter = 0
+ftol=1.0d-5
+
+kp = 0
+eflow = 1.0d10+eflows(1)
+do i = 1, neflow
+ do while (eflow.ne.eflows(i))
+  eflow = eflows(i)
+  if(rank.eq.0)write(stdout,*)'Switch to eflow = ', eflow
+  flagcrash = 1
+  do while(flagcrash.eq.1)
+   call initall
+   flagcrash = 0
+   call solve(flagcrash)
+   if(flagcrash.eq.1) then
+    if(i.eq.1)stop
+    eflow = (eflow + eflowOK)/2.0
+    if(rank.eq.0)write(stdout,*)'Error, switch to eflow = ', eflow
+   endif
+  enddo
+
+  eflowOK = eflow ! last st solved OK
+  if(rank.eq.0)write(stdout,*) 'Solved OK, eflow: ', eflowOK
+
+ enddo
+
+ counterr = counter + i + ii  - 1
+ call Free_Energy_Calc(vname,eflow)
+ if(rank.eq.0)write(stdout,*) 'Free energy after solving', free_energy
+ call savedata(counterr)
+ if(rank.eq.0)write(stdout,*) 'Save OK'
+ call store2disk(vname,eflow)
+
 enddo
+
+endselect
 
 call endall
 end

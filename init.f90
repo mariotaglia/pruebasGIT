@@ -22,7 +22,7 @@ zpos = 1.0
 zneg = -1.0
 vsol = vsol0
 vsalt=((4.0/3.0)*pi*(0.2)**3)/vsol  ! volume salt in units of vsol 0.2=radius salt  
-vpol= vpol0/vsol ! ((4.0/3.0)*pi*(0.2)**3)/vsol  ! volume polymer segment in units of vsol 
+vpol= ((4.0/3.0)*pi*(rpol)**3)/vsol
 constq=delta*delta*4.0*pi*lb/vsol   ! multiplicative factor in poisson eq  
 pKw = 14
 error = 1e-4 ! para comparar con la norma...
@@ -275,7 +275,7 @@ endif
 
 end subroutine
 
-subroutine store2disk(counter) ! saves state to disk
+subroutine store2disk(vn,currentv) ! saves state to disk
 use ellipsoid
 use kinsol
 use montecarlo
@@ -284,24 +284,28 @@ use results
 use MPI
 use const
 implicit none
-integer counter
+character*4 vn
+real*8 currentv
+!integer counter
 character*20 filename
 
 if(rank.eq.0) then
 open (unit=8, file='out.out', form='unformatted')
-write(8)counter
+!write(8)counter
 write(8)free_energy
 write(8)xflag
 close(8)
 endif
 
 if(rank.eq.0) then
-write(filename,'(A4, I3.3, A4)')'out.', counter, '.dat'
+if(vn.ne.'HIkp') then
+write(filename,'(A4, A4, F5.3, A4)')'out.', vn, currentv, '.dat'
 open(unit=8, file=filename, form='unformatted')
-write(8)counter
+!write(8)counter
 write(8)free_energy
 write(8)xflag
 close(8)
+endif
 endif
 end subroutine
 
@@ -316,7 +320,7 @@ implicit none
 integer counter
 
 open (unit=8, file='in.in', form='unformatted')
-read(8)counter
+!read(8)counter
 read(8)free_energy
 read(8)xflag
 close(8)
