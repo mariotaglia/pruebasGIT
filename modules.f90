@@ -16,7 +16,6 @@ endmodule
 
 module system 
 integer systemtype
-integer vscan
 real*8 delta
 real*8 dx,dy,dz
 real*8 cdiva
@@ -58,8 +57,6 @@ real*8 originc(2)
 real*8 echargec, sigmac, eepsc, sigmar
 integer NBRUSH
 integer RdimZ ! size of reservoirs in delta units
-integer Nrings ! number of rings for systemtype = 42
-real*8, allocatable :: ringpos(:) ! position along the pore
 endmodule
 
 module s2d
@@ -93,10 +90,8 @@ endmodule
 
 module molecules
 use system
-integer potential
 real*8 vsol
 real*8 vpol
-real*8 rpol
 real*8 vpol0
 real*8 vsol0
 real*8 vsalt
@@ -179,7 +174,6 @@ integer stdout
 endmodule
 
 module kai
-real*8 lambda
 integer Xulimit
 real*8 cutoff
 real*8, allocatable :: Xu(:,:,:)

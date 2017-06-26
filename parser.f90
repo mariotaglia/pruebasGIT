@@ -51,8 +51,6 @@ sigmar = 0.0 ! random sigma
 ! Check validity of input
 !
 
-vscan = ndi
-potential = ndi
 scx = ndi
 scy = ndi
 scz = ndi
@@ -79,11 +77,10 @@ dy = ndr
 dz = ndr
 cdiva = ndr
 csalt = ndr
-rpol = ndr
+vpol0 = ndr
 vsol0 = ndr
 gama0 = ndr
 benergy = ndr
-lambda = ndr
 
 nsc = 1
 scs(1) = 1.0
@@ -262,20 +259,9 @@ do while (ios == 0)
    read(buffer, *, iostat=ios) benergy
    if(rank.eq.0)write(stdout,*) 'parser:','Set ',trim(label),' = ',trim(buffer)
 
- case ('rpol')
-   read(buffer, *, iostat=ios) rpol
-   if(rank.eq.0)write(stdout,*) 'parser:','Set ',trim(label),' = ',trim(buffer)
 
- case ('vscan')
-   read(buffer, *, iostat=ios) vscan
-   if(rank.eq.0)write(stdout,*) 'parser:','Set ',trim(label),' = ',trim(buffer)
-
- case ('potential')
-   read(buffer, *, iostat=ios) potential
-   if(rank.eq.0)write(stdout,*) 'parser:','Set ',trim(label),' = ',trim(buffer)
-
- case ('lambda')
-   read(buffer, *, iostat=ios) lambda
+ case ('vpol')
+   read(buffer, *, iostat=ios) vpol0
    if(rank.eq.0)write(stdout,*) 'parser:','Set ',trim(label),' = ',trim(buffer)
 
  case ('sigmar')
@@ -366,29 +352,7 @@ do while (ios == 0)
      read(fh, *) echargec
      read(fh, *) basura
      read(fh, *) eepsc
- 
-    case(42, 52)
-     read(fh, *) basura
-     read(fh, *) rchannel
-     read(fh, *) basura
-     read(fh, *) RdimZ
-     read(fh, *) basura
-     read(fh, *) NBRUSH ! number of brushes in the tetha direction
-     read(fh, *) basura
-     read(fh, *) Nrings
 
-     allocate (ringpos(Nrings))
-
-     read(fh, *) basura
-     do i = 1, Nrings
-       read(fh, *) ringpos(i)
-     enddo
-      ringpos = ringpos - 0.5
-    
-     read(fh, *) basura
-     read(fh, *) echargec
-     read(fh, *) basura
-     read(fh, *) eepsc
 
     case(1) 
      read(fh, *) basura

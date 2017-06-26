@@ -49,15 +49,12 @@ real*8 gradpsi2
 real*8 fv
 
 ! hamiltonian inception
-real*8 hfactor, hd
-real*8, allocatable :: hds(:)
-ALLOCATE(hds(100))
-hds = -1
+real*8 hfactor, hd, hd0, hd1, hd2, hd3, hd4, hd5, hd6
 
 !-----------------------------------------------------
 ! Common variables
 
-shift = 1.0d-100
+shift = 1.0d-200
 
 ncells = dimx*dimy*dimz ! numero de celdas
 
@@ -224,28 +221,106 @@ do ix=1,dimx
  do iy=1,dimy
    do iz=1,dimz
 
-     if(hguess .eq. 0) then
+     select case (hguess)
 
-      hd = sqrt(float((2*ix-dimx)**2+(2*iy-dimy)**2))/2.0*delta
-      hd = hd**2+(oval*float(2*iz-dimz)/2.0*delta)**2
+     case (0) !ring
+
+      hd0 = sqrt(float((2*ix-dimx)**2+(2*iy-dimy)**2))/2.0*delta
+      hd0 = hd0**2+(oval*float(2*iz-dimz)/2.0*delta)**2
+
+      hd = hd0
       hfactor = dexp(-(kp**2)*hd)
 
-     elseif(hguess .eq. 1) then
+     case (1) !ring
 
-      hd = sqrt(float((2*ix-dimx)**2+(2*iy-dimy)**2))/2.0*delta-hring
-      hd = hd**2+(oval*float(2*iz-dimz)/2.0*delta)**2
+      hd1 = sqrt(float((2*ix-dimx)**2+(2*iy-dimy)**2))/2.0*delta-hring
+      hd1 = hd1**2+(oval*float(2*iz-dimz)/2.0*delta)**2
+
+      hd = hd1
       hfactor = dexp(-(kp**2)*hd)
 
-     else
+!      hfactor = dexp(-(kp**2)*hd1)
+!      hfactor=hfactor/1
 
-      do i=1,hguess
-       hds(i) = (float(2*ix-dimx)-2*cos(i*2*pi/hguess)*hring/delta)**2+(float(2*iy-dimy)-2*sin(i*2*pi/hguess)*hring/delta)**2
-       hds(i) = hds(i)/4.0*(delta**2)+(oval*float(2*iz-dimz)/2.0*delta)**2
-      end do
-      hd = minval(hds, mask = hds .gt.0)
+     case (2) !two clusters
+
+      hd1 = sqrt((float(2*ix-dimx)-2*hring/delta)**2+float(2*iy-dimy)**2)/2.0*delta
+      hd1 = hd1**2+(oval*float(2*iz-dimz)/2.0*delta)**2
+
+      hd2 = sqrt((float(2*ix-dimx)+2*hring/delta)**2+float(2*iy-dimy)**2)/2.0*delta
+      hd2 = hd2**2+(oval*float(2*iz-dimz)/2.0*delta)**2
+
+      hd = min(hd1,hd2)
       hfactor = dexp(-(kp**2)*hd)
 
-     end if
+!      hfactor = dexp(-(kp**2)*hd1) + dexp(-(kp**2)*hd2)
+!      hfactor=hfactor/2
+
+     case (3) !two clusters
+
+      hd1 = sqrt((float(2*ix-dimx)-2*hring/delta)**2+float(2*iy-dimy)**2)/2.0*delta
+      hd1 = hd1**2+(oval*float(2*iz-dimz)/2.0*delta)**2
+
+      hd2 = sqrt((float(2*ix-dimx)+2*0.5*hring/delta)**2+(float(2*iy-dimy)-2*0.87*hring/delta)**2)/2.0*delta
+      hd2 = hd2**2+(oval*float(2*iz-dimz)/2.0*delta)**2
+
+      hd3 = sqrt((float(2*ix-dimx)+2*0.5*hring/delta)**2+(float(2*iy-dimy)+2*0.87*hring/delta)**2)/2.0*delta
+      hd3 = hd3**2+(oval*float(2*iz-dimz)/2.0*delta)**2
+
+      hd = min(hd1,hd2,hd3)
+      hfactor = dexp(-(kp**2)*hd)
+
+!      hfactor = dexp(-(kp**2)*hd1) + dexp(-(kp**2)*hd2) + dexp(-(kp**2)*hd3)
+!      hfactor=hfactor/3
+
+     case (4) !two clusters
+
+      hd1 = sqrt((float(2*ix-dimx)-2*hring/delta)**2+float(2*iy-dimy)**2)/2.0*delta
+      hd1 = hd1**2+(oval*float(2*iz-dimz)/2.0*delta)**2
+
+      hd2 = sqrt((float(2*ix-dimx)+2*hring/delta)**2+float(2*iy-dimy)**2)/2.0*delta
+      hd2 = hd2**2+(oval*float(2*iz-dimz)/2.0*delta)**2
+
+      hd3 = sqrt((float(2*iy-dimy)-2*hring/delta)**2+float(2*ix-dimx)**2)/2.0*delta
+      hd3 = hd3**2+(oval*float(2*iz-dimz)/2.0*delta)**2
+
+      hd4 = sqrt((float(2*iy-dimy)+2*hring/delta)**2+float(2*ix-dimx)**2)/2.0*delta
+      hd4 = hd4**2+(oval*float(2*iz-dimz)/2.0*delta)**2
+
+      hd = min(hd1,hd2,hd3,hd4)
+      hfactor = dexp(-(kp**2)*hd)
+
+!      hfactor = dexp(-(kp**2)*hd1) + dexp(-(kp**2)*hd2) + dexp(-(kp**2)*hd3) + dexp(-(kp**2)*hd4)
+!      hfactor=hfactor/4
+
+     case (6) !two clusters
+
+      hd1 = sqrt((float(2*ix-dimx)-2*hring/delta)**2+float(2*iy-dimy)**2)/2.0*delta
+      hd1 = hd1**2+(oval*float(2*iz-dimz)/2.0*delta)**2
+
+      hd2 = sqrt((float(2*ix-dimx)+2*0.5*hring/delta)**2+(float(2*iy-dimy)-2*0.87*hring/delta)**2)/2.0*delta
+      hd2 = hd2**2+(oval*float(2*iz-dimz)/2.0*delta)**2
+
+      hd3 = sqrt((float(2*ix-dimx)+2*0.5*hring/delta)**2+(float(2*iy-dimy)+2*0.87*hring/delta)**2)/2.0*delta
+      hd3 = hd3**2+(oval*float(2*iz-dimz)/2.0*delta)**2
+
+      hd4 = sqrt((float(2*ix-dimx)+2*hring/delta)**2+float(2*iy-dimy)**2)/2.0*delta
+      hd4 = hd4**2+(oval*float(2*iz-dimz)/2.0*delta)**2
+
+      hd5 = sqrt((float(2*ix-dimx)-2*0.5*hring/delta)**2+(float(2*iy-dimy)-2*0.87*hring/delta)**2)/2.0*delta
+      hd5 = hd5**2+(oval*float(2*iz-dimz)/2.0*delta)**2
+
+      hd6 = sqrt((float(2*ix-dimx)-2*0.5*hring/delta)**2+(float(2*iy-dimy)+2*0.87*hring/delta)**2)/2.0*delta
+      hd6 = hd6**2+(oval*float(2*iz-dimz)/2.0*delta)**2
+
+      hd = min(hd1,hd2,hd3,hd4,hd5,hd6)
+      hfactor = dexp(-(kp**2)*hd)
+
+!      hfactor=dexp(-(kp**2)*hd1)+dexp(-(kp**2)*hd2)+dexp(-(kp**2)*hd3)+dexp(-(kp**2)*hd4)+dexp(-(kp**2)*hd5)+dexp(-(kp**2)*hd6)
+!      hfactor=hfactor/6
+
+     endselect
+
 
      fv = (1.0 - volprot(ix,iy,iz))
      xpot(ix, iy, iz, im) = xh(ix,iy,iz)**vpol
