@@ -62,6 +62,7 @@ integer RdimZ ! size of reservoirs in delta units
 real*8 gspacer
 integer Nrings ! number of rings for systemtype = 42
 real*8, allocatable :: ringpos(:) ! position along the pore
+integer Npolx, Npoly
 endmodule
 
 module s2d

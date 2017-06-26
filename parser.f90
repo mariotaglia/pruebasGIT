@@ -404,6 +404,12 @@ do while (ios == 0)
      read(fh, *) basura
      read(fh, *) eepsc
  
+    case(6) ! planar surface
+     read(fh, *) basura
+     read(fh, *) Npolx, Npoly ! number of polymers in x and y
+     read(fh, *) basura
+     read(fh, *) eepsc
+ 
     case(42, 52)
      read(fh, *) basura
      read(fh, *) rchannel
