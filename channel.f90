@@ -1198,8 +1198,8 @@ volq = 0.0 ! charge not implemented for planar surfaces yet
 
 ! add com1 and volx to list
 
-spacex = float(dimx)*delta/(float(Npolx+1)) ! space in the x direction in nm
-spacey = float(dimy)*delta/(float(Npoly+1)) ! space in the y direction in nm
+spacex = float(dimx)*delta/float(Npolx) ! space in the x direction in nm
+spacey = float(dimy)*delta/float(Npoly) ! space in the y direction in nm
 
 com = 0.0
 ncha = 0
@@ -1207,18 +1207,19 @@ do i = 1, Npolx
  do j = 1, Npoly
  ncha = ncha + 1
 
- v(1) = spacex*float(i)
- v(2) = spacey*float(j)
+ v(1) = spacex*float(i)-spacex/2.0
+ v(2) = spacey*float(j)-spacey/2.0
  v(3) = 0.0
 
 ! v in transformed space, x in real space
 
  x = MATMUL(IMAT,v)
- 
+
  com(ncha,:) = x(:)
- p0(ncha,:) = int(com(ncha,:))+1
+ p0(ncha,:) = int(v(:)/delta)+1
  
  volxx(p0(ncha,1),p0(ncha,2), p0(ncha,3)) = 1.0 
+ volx(ncha) = 1.0
  enddo
 enddo
 
@@ -1237,6 +1238,9 @@ call savetodisk(voleps, title, counter)
 title = 'avgrf'
 counter = 1
 call savetodisk(volxx, title, counter)
+
+flag=.false.
+
 end subroutine
 
 

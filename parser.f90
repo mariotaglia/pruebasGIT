@@ -409,6 +409,8 @@ do while (ios == 0)
      read(fh, *) Npolx, Npoly ! number of polymers in x and y
      read(fh, *) basura
      read(fh, *) eepsc
+     NNN = 0 ! no particles
+
  
     case(42, 52)
      read(fh, *) basura
