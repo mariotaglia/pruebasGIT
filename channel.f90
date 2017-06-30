@@ -1209,7 +1209,7 @@ do i = 1, Npolx
 
  v(1) = spacex*float(i)-spacex/2.0
  v(2) = spacey*float(j)-spacey/2.0
- v(3) = 0.0
+ v(3) = lseg
 
 ! v in transformed space, x in real space
 
