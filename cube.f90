@@ -69,7 +69,7 @@ ncha = 0
 
  call integrate_cube(l_cubeS,c_cube,npoints, volq1, sumvolq1, flag)
 
- call newintegrateg_cube(l_cube,c_cube,npoints,volx1,sumvolx1, com1, p1, ncha1, volxx1)
+ call newintegrateg_cube(l_cube,c_cube,l_pol,npoints,volx1,sumvolx1, com1, p1, ncha1, volxx1)
 
 !! eps
  voleps1 = voleps1-volprot1
@@ -137,8 +137,6 @@ call savetodisk(volq, title, counter)
 title = 'avgrf'
 counter = 1
 call savetodisk(volxx, title, counter)
-
-stop
 
 end subroutine
 
@@ -263,7 +261,7 @@ enddo
 intcell_cube  = float(cc)/(float(n)**3)
 end function
 
-subroutine newintegrateg_cube(l_cube,c_cube,npoints,volx1,sumvolx1,com1,p1,ncha1,volxx1)
+subroutine newintegrateg_cube(l_cube,c_cube,l_pol,npoints,volx1,sumvolx1,com1,p1,ncha1,volxx1)
 use system
 use transform
 use chainsdat
@@ -317,8 +315,8 @@ do iy = 1,l_pol
 
 ! Cara de abajo xy
 
-x(1) = c_cube(1) - l_cube/2.0 + float(ix)*sep + sep/2.0
-x(2)= c_cube(2) - l_cube/2.0 + float(iy)*sep + sep/2.0
+x(1) = c_cube(1) - l_cube/2.0 + float(ix)*sep - sep/2.0
+x(2)= c_cube(2) - l_cube/2.0 + float(iy)*sep - sep/2.0
 x(3) = c_cube(3) - l_cube/2.0
 
 do j = 1,3
@@ -344,8 +342,8 @@ com1(ncha1,3) = com1(ncha1,3) - lseg/2.0
 
 ! Cara de arriba xy
 
-x(1) = c_cube(1) - l_cube/2.0 + float(ix)*sep + sep/2.0
-x(2)= c_cube(2) - l_cube/2.0 + float(iy)*sep + sep/2.0
+x(1) = c_cube(1) - l_cube/2.0 + float(ix)*sep -  sep/2.0
+x(2)= c_cube(2) - l_cube/2.0 + float(iy)*sep -  sep/2.0
 x(3) = c_cube(3) + l_cube/2.0
 
 do j = 1,3
@@ -371,9 +369,9 @@ com1(ncha1,3) = com1(ncha1,3) + lseg/2.0
 
 ! Cara de adelante zx
 
-x(1) = c_cube(1) - l_cube/2.0 + float(ix)*sep + sep/2.0
+x(1) = c_cube(1) - l_cube/2.0 + float(ix)*sep - sep/2.0
 x(2)= c_cube(2) - l_cube/2.0
-x(3) = c_cube(3) - l_cube/2.0 + float(iy)*sep + sep/2.0
+x(3) = c_cube(3) - l_cube/2.0 + float(iy)*sep -  sep/2.0
 
 do j = 1,3
     js(j) = floor(x(j)/delta)+1
@@ -398,9 +396,9 @@ com1(ncha1,2) = com1(ncha1,2) - lseg/2.0
 
 ! Cara de atras zx
 
-x(1) = c_cube(1) - l_cube/2.0 + float(ix)*sep + sep/2.0
+x(1) = c_cube(1) - l_cube/2.0 + float(ix)*sep - sep/2.0
 x(2)= c_cube(2) + l_cube/2.0
-x(3) = c_cube(3) - l_cube/2.0 + float(iy)*sep + sep/2.0
+x(3) = c_cube(3) - l_cube/2.0 + float(iy)*sep - sep/2.0
 
 do j = 1,3
     js(j) = floor(x(j)/delta)+1
@@ -426,8 +424,8 @@ com1(ncha1,2) = com1(ncha1,2) + lseg/2.0
 ! Cara izquierda yz
 
 x(1) = c_cube(1) - l_cube/2.0
-x(2)= c_cube(2) - l_cube/2.0 + float(ix)*sep + sep/2.0
-x(3) = c_cube(3) - l_cube/2.0 + float(iy)*sep + sep/2.0
+x(2)= c_cube(2) - l_cube/2.0 + float(ix)*sep -  sep/2.0
+x(3) = c_cube(3) - l_cube/2.0 + float(iy)*sep - sep/2.0
 
 do j = 1,3
     js(j) = floor(x(j)/delta)+1
@@ -452,9 +450,9 @@ com1(ncha1,1) = com1(ncha1,1) - lseg/2.0
 
 ! Cara derecha xz
 
-x(1) = c_cube(1) + l_cube/2.0 + float(ix)*sep + sep/2.0
-x(2)= c_cube(2) - l_cube/2.0 + float(ix)*sep + sep/2.0
-x(3) = c_cube(3) - l_cube/2.0
+x(1) = c_cube(1) + l_cube/2.0
+x(2)= c_cube(2) - l_cube/2.0 + float(ix)*sep - sep/2.0
+x(3) = c_cube(3) - l_cube/2.0 + float(iy)*sep - sep/2.0
 
 do j = 1,3
     js(j) = floor(x(j)/delta)+1
