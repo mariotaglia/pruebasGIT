@@ -14,6 +14,7 @@ use kaist
 use s2d
 use channel
 use branches
+use cube
 implicit none
 
 ! Input related variables
@@ -367,7 +368,19 @@ do while (ios == 0)
      read(fh, *) eepsc
      NNN = 0 ! no particles
 
- 
+    case(7) ! cube
+     read(fh, *) basura
+     read(fh, *) l_cube ! lado del cubo
+     read(fh, *) basura
+     read(fh, *) c_cube(1), c_cube(2), c_cube(3) !posicion del centro del cubo
+     read(fh, *) basura
+     read(fh, *) l_pol ! numero de polimeros por lado (integer)
+     read(fh, *) basura
+     read(fh, *) echargec
+     read(fh, *) basura
+     read(fh, *) eepsc
+     NNN = 0
+
     case(42, 52) ! 42: channel, 52: rod
      read(fh, *) basura
      read(fh, *) rchannel
