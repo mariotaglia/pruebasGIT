@@ -9,6 +9,7 @@ use chainsdat
 use conformations
 use const
 use transform
+
 implicit none
     
 integer j, ii, jj,i
@@ -19,6 +20,7 @@ real*8 v(3)
 integer testsystem
 integer testsystemr
 integer testsystemc
+integer testsystem_cube
 real*8 maxx(3)
 integer flag
 integer aa
@@ -68,6 +70,17 @@ case (6)
        endif
 
        if(testsystem(x).eq.-2) then ! if testsystem = -2, the polymer goes out-of-system
+         write(stdout,*) 'pxs: out-of-system'
+         stop
+       endif
+
+case (7)
+       if(testsystem_cube(x).eq.-1) then ! if testsystem = -1,  there is a collision with all or particle 
+         flag = -1
+         exit
+       endif
+
+       if(testsystem_cube(x).eq.-2) then ! if testsystem = -2, the polymer goes out-of-system
          write(stdout,*) 'pxs: out-of-system'
          stop
        endif
