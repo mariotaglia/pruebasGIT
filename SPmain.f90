@@ -91,6 +91,7 @@ elseif (systemtype.eq.60) then
 call update_matrix_60(flag) ! channel + particles
 elseif (systemtype.eq.7) then ! cube
 call update_matrix_cube(flag) ! updates 'the matrix'
+call puntas
 endif
 
   if(flag.eqv..true.) then

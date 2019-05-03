@@ -109,6 +109,10 @@ real*8 c_cube(3)
 integer l_pol
 endmodule
 
+module mmask
+real*8, allocatable :: mask(:,:,:)
+endmodule
+
 module kaist
 integer hguess
 real*8 hring

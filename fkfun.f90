@@ -325,7 +325,7 @@ do ix=1,dimx
       enddo
      enddo
 
-     xpot(ix,iy,iz,im) = xpot(ix,iy,iz,im)*dexp(protemp)
+     xpot(ix,iy,iz,im) =xpot(ix,iy,iz,im)*dexp(protemp)
 
      endif ! hydrph
 
