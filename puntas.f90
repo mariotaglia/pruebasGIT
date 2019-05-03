@@ -45,9 +45,9 @@ do i = 1,dimx
  enddo
 enddo
 
-title = 'aveps'
+title = 'punta'
 counter = 1
-call savetodisk(voleps, title, counter)
+call savetodisk(mask, title, counter)
 
 stop
 

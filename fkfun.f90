@@ -16,6 +16,8 @@ use ellipsoid
 use transform
 use kaist
 use mparameters_monomer
+use mmask
+
 implicit none
 
 integer*4 ier2
@@ -220,28 +222,34 @@ do ix=1,dimx
  do iy=1,dimy
    do iz=1,dimz
 
-     if(hguess .eq. 0) then
+    ! if(hguess .eq. 0) then
 
-      hd = sqrt(float((2*ix-dimx)**2+(2*iy-dimy)**2))/2.0*delta
-      hd = hd**2+(oval*float(2*iz-dimz)/2.0*delta)**2
-      hfactor = dexp(-(kp**2)*hd)
+     ! hd = sqrt(float((2*ix-dimx)**2+(2*iy-dimy)**2))/2.0*delta
+     ! hd = hd**2+(oval*float(2*iz-dimz)/2.0*delta)**2
+     ! hfactor = dexp(-(kp**2)*hd)
 
-     elseif(hguess .eq. 1) then
+     !elseif(hguess .eq. 1) then
 
-      hd = sqrt(float((2*ix-dimx)**2+(2*iy-dimy)**2))/2.0*delta-hring
-      hd = hd**2+(oval*float(2*iz-dimz)/2.0*delta)**2
-      hfactor = dexp(-(kp**2)*hd)
+      !hd = sqrt(float((2*ix-dimx)**2+(2*iy-dimy)**2))/2.0*delta-hring
+      !hd = hd**2+(oval*float(2*iz-dimz)/2.0*delta)**2
+      !hfactor = dexp(-(kp**2)*hd)
 
-     else
+    ! else
 
-      do i=1,hguess
-       hds(i) = (float(2*ix-dimx)-2*cos(i*2*pi/hguess)*hring/delta)**2+(float(2*iy-dimy)-2*sin(i*2*pi/hguess)*hring/delta)**2
-       hds(i) = hds(i)/4.0*(delta**2)+(oval*float(2*iz-dimz)/2.0*delta)**2
-      end do
-      hd = minval(hds, mask = hds .gt.0)
-      hfactor = dexp(-(kp**2)*hd)
+     ! do i=1,hguess
+      ! hds(i) = (float(2*ix-dimx)-2*cos(i*2*pi/hguess)*hring/delta)**2+(float(2*iy-dimy)-2*sin(i*2*pi/hguess)*hring/delta)**2
+       !hds(i) = hds(i)/4.0*(delta**2)+(oval*float(2*iz-dimz)/2.0*delta)**2
+     ! end do
+     ! hd = minval(hds, mask = hds .gt.0)
+    !  hfactor = dexp(-(kp**2)*hd)
 
-     end if
+     !end if
+     if(vscan.eq.2) hfactor = 1.0
+
+     if(vscan.eq.1) then
+       hfactor = mask(ix,iy,iz)*kp
+       if(hfactor.gt.1) hfactor = 1.0
+     endif
 
      fv = (1.0 - volprot(ix,iy,iz))
      xpot(ix, iy, iz, im) = xh(ix,iy,iz)**vpol
