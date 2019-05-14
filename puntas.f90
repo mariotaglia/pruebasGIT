@@ -7,7 +7,7 @@ use mmask
 implicit none
 integer i,j,k
 integer nx, ny, nz
-real*8 vertices(8,3)
+real*8 vertices(1,3) !Número de centros de las gaussianas, 3
 real*8 Xarray(3)
 real*8, dimension(:,:), allocatable :: vert_test
 real*8 points_test(3)
@@ -19,18 +19,18 @@ allocate(mask(dimx,dimy,dimz))
 
 ! Vértices del cubo
 
-vertices(1,:) = (/c_cube(1) + l_cube/2.0,c_cube(2) + l_cube/2.0,c_cube(3) + l_cube/2.0/)
-vertices(2,:) = (/c_cube(1) - l_cube/2.0,c_cube(2) + l_cube/2.0,c_cube(3) + l_cube/2.0/)
-vertices(3,:) = (/c_cube(1) + l_cube/2.0,c_cube(2) - l_cube/2.0,c_cube(3) + l_cube/2.0/)
-vertices(4,:) = (/c_cube(1) + l_cube/2.0,c_cube(2) + l_cube/2.0,c_cube(3) - l_cube/2.0/)
-vertices(5,:) = (/c_cube(1) - l_cube/2.0,c_cube(2) - l_cube/2.0,c_cube(3) + l_cube/2.0/)
-vertices(6,:) = (/c_cube(1) + l_cube/2.0,c_cube(2) - l_cube/2.0,c_cube(3) - l_cube/2.0/)
-vertices(7,:) = (/c_cube(1) - l_cube/2.0,c_cube(2) + l_cube/2.0,c_cube(3) - l_cube/2.0/)
-vertices(8,:) = (/c_cube(1) - l_cube/2.0,c_cube(2) - l_cube/2.0,c_cube(3) - l_cube/2.0/)
+vertices(1,:) = (/c_cube(1) + l_cube/2.0,c_cube(2) + l_cube/2.0,c_cube(3) + l_cube/2.0/) !Solo este vertice para el octavo del cubo
+!vertices(2,:) = (/c_cube(1) - l_cube/2.0,c_cube(2) + l_cube/2.0,c_cube(3) + l_cube/2.0/)
+!vertices(3,:) = (/c_cube(1) + l_cube/2.0,c_cube(2) - l_cube/2.0,c_cube(3) + l_cube/2.0/)
+!vertices(4,:) = (/c_cube(1) + l_cube/2.0,c_cube(2) + l_cube/2.0,c_cube(3) - l_cube/2.0/)
+!vertices(5,:) = (/c_cube(1) - l_cube/2.0,c_cube(2) - l_cube/2.0,c_cube(3) + l_cube/2.0/)
+!vertices(6,:) = (/c_cube(1) + l_cube/2.0,c_cube(2) - l_cube/2.0,c_cube(3) - l_cube/2.0/)
+!vertices(7,:) = (/c_cube(1) - l_cube/2.0,c_cube(2) + l_cube/2.0,c_cube(3) - l_cube/2.0/)
+!vertices(8,:) = (/c_cube(1) - l_cube/2.0,c_cube(2) - l_cube/2.0,c_cube(3) - l_cube/2.0/)
 
 ! testeo con un punto arbitrario
 
-allocate(vert_test(8,3))
+allocate(vert_test(1,3)) !Número de centros de las gaussianas, 3
 vert_test = vertices
 sigma = delta
 
@@ -48,8 +48,6 @@ enddo
 title = 'punta'
 counter = 1
 call savetodisk(mask, title, counter)
-
-stop
 
 contains
 

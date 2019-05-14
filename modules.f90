@@ -107,6 +107,7 @@ module cube
 real*8 l_cube
 real*8 c_cube(3)
 integer l_pol
+integer cubeR
 endmodule
 
 module mmask

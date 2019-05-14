@@ -376,6 +376,8 @@ do while (ios == 0)
      read(fh, *) basura
      read(fh, *) l_pol ! numero de polimeros por lado (integer)
      read(fh, *) basura
+     read(fh, *) cubeR! cubo entero = 0; tercio del cubo = 1
+     read(fh, *) basura
      read(fh, *) echargec
      read(fh, *) basura
      read(fh, *) eepsc

@@ -69,7 +69,7 @@ ncha = 0
 
  call integrate_cube(l_cubeS,c_cube,npoints, volq1, sumvolq1, flag)
 
- call newintegrateg_cube(l_cube,c_cube,l_pol,npoints,volx1,sumvolx1, com1, p1, ncha1, volxx1)
+ call newintegrateg_cube(l_cube,c_cube,cubeR,l_pol,npoints,volx1,sumvolx1, com1, p1, ncha1, volxx1)
 
 !! eps
  voleps1 = voleps1-volprot1
@@ -261,7 +261,7 @@ enddo
 intcell_cube  = float(cc)/(float(n)**3)
 end function
 
-subroutine newintegrateg_cube(l_cube,c_cube,l_pol,npoints,volx1,sumvolx1,com1,p1,ncha1,volxx1)
+subroutine newintegrateg_cube(l_cube,c_cube,cubeR,l_pol,npoints,volx1,sumvolx1,com1,p1,ncha1,volxx1)
 use system
 use transform
 use chainsdat
@@ -274,6 +274,7 @@ integer indexvolx(dimx,dimy,dimz)
 integer listvolx(ncha,3)
 real*8 sep !separacion entre polimeros en una cara
 real*8 l_cube, c_cube(3)
+integer cubeR
 real*8 phi, dphi, tetha,dtetha, as, ds
 integer mphi, mtetha
 integer ix,iy,iz,jx,jy,jz
@@ -310,10 +311,12 @@ volxx1 = 0.0
 ! This routine determines the surface coverage and grafting positions only for cylinder
 !
 
+if (cubeR.eq.0) then
+
 do ix =1,l_pol
 do iy = 1,l_pol
-
-! Cara de abajo xy
+        
+! Cara de ABAJO
 
 x(1) = c_cube(1) - l_cube/2.0 + float(ix)*sep - sep/2.0
 x(2)= c_cube(2) - l_cube/2.0 + float(iy)*sep - sep/2.0
@@ -340,7 +343,7 @@ sumvolx1 = sumvolx1 + 1.0
 com1(ncha1,:) = x(:)
 com1(ncha1,3) = com1(ncha1,3) - lseg/2.0
 
-! Cara de arriba xy
+! Cara de ARRIBA
 
 x(1) = c_cube(1) - l_cube/2.0 + float(ix)*sep -  sep/2.0
 x(2)= c_cube(2) - l_cube/2.0 + float(iy)*sep -  sep/2.0
@@ -367,7 +370,7 @@ sumvolx1 = sumvolx1 + 1.0
 com1(ncha1,:) = x(:)
 com1(ncha1,3) = com1(ncha1,3) + lseg/2.0
 
-! Cara de adelante zx
+! Cara de IZQUIERDA
 
 x(1) = c_cube(1) - l_cube/2.0 + float(ix)*sep - sep/2.0
 x(2)= c_cube(2) - l_cube/2.0
@@ -394,7 +397,7 @@ sumvolx1 = sumvolx1 + 1.0
 com1(ncha1,:) = x(:)
 com1(ncha1,2) = com1(ncha1,2) - lseg/2.0
 
-! Cara de atras zx
+! Cara de DERECHA zx
 
 x(1) = c_cube(1) - l_cube/2.0 + float(ix)*sep - sep/2.0
 x(2)= c_cube(2) + l_cube/2.0
@@ -407,7 +410,7 @@ jx = js(1)
 jy = js(2)
 jz = js(3)
 
-! increase counter
+!increase counter
  ncha1 = ncha1 + 1
 
  indexvolx(jx,jy,jz) = ncha1
@@ -421,7 +424,7 @@ sumvolx1 = sumvolx1 + 1.0
 com1(ncha1,:) = x(:)
 com1(ncha1,2) = com1(ncha1,2) + lseg/2.0
 
-! Cara izquierda yz
+! Cara de ATRAS
 
 x(1) = c_cube(1) - l_cube/2.0
 x(2)= c_cube(2) - l_cube/2.0 + float(ix)*sep -  sep/2.0
@@ -434,7 +437,7 @@ jx = js(1)
 jy = js(2)
 jz = js(3)
 
-! increase counter
+ !increase counter
  ncha1 = ncha1 + 1
 
  indexvolx(jx,jy,jz) = ncha1
@@ -448,7 +451,7 @@ sumvolx1 = sumvolx1 + 1.0
 com1(ncha1,:) = x(:)
 com1(ncha1,1) = com1(ncha1,1) - lseg/2.0
 
-! Cara derecha xz
+! Cara de ADELANTE
 
 x(1) = c_cube(1) + l_cube/2.0
 x(2)= c_cube(2) - l_cube/2.0 + float(ix)*sep - sep/2.0
@@ -477,5 +480,98 @@ com1(ncha1,1) = com1(ncha1,1) + lseg/2.0
 
 enddo
 enddo
+
+endif
+
+if (cubeR.eq.1) then
+
+do ix =1,l_pol
+do iy = 1,l_pol
+
+! Cara de ARRIBA
+
+x(1) = c_cube(1) - l_cube/2.0 + float(ix)*sep -  sep/2.0
+x(2)= c_cube(2) - l_cube/2.0 + float(iy)*sep -  sep/2.0
+x(3) = c_cube(3) + l_cube/2.0
+
+do j = 1,3
+    js(j) = floor(x(j)/delta)+1
+enddo
+jx = js(1)
+jy = js(2)
+jz = js(3)
+
+! increase counter
+ ncha1 = ncha1 + 1
+
+ indexvolx(jx,jy,jz) = ncha1
+ p1(ncha1,1)=jx
+ p1(ncha1,2)=jy
+ p1(ncha1,3)=jz
+
+volxx1(jx,jy,jz) =  volxx1(jx,jy,jz) + 1.0
+volx1(indexvolx(jx,jy,jz)) = volx1(indexvolx(jx,jy,jz)) + 1.0
+sumvolx1 = sumvolx1 + 1.0
+com1(ncha1,:) = x(:)
+com1(ncha1,3) = com1(ncha1,3) + lseg/2.0
+
+! Cara de DERECHA zx
+
+x(1) = c_cube(1) - l_cube/2.0 + float(ix)*sep - sep/2.0
+x(2)= c_cube(2) + l_cube/2.0
+x(3) = c_cube(3) - l_cube/2.0 + float(iy)*sep - sep/2.0
+
+do j = 1,3
+    js(j) = floor(x(j)/delta)+1
+enddo
+jx = js(1)
+jy = js(2)
+jz = js(3)
+
+!increase counter
+ ncha1 = ncha1 + 1
+
+ indexvolx(jx,jy,jz) = ncha1
+ p1(ncha1,1)=jx
+ p1(ncha1,2)=jy
+ p1(ncha1,3)=jz
+
+volxx1(jx,jy,jz) =  volxx1(jx,jy,jz) + 1.0
+volx1(indexvolx(jx,jy,jz)) = volx1(indexvolx(jx,jy,jz)) + 1.0
+sumvolx1 = sumvolx1 + 1.0
+com1(ncha1,:) = x(:)
+com1(ncha1,2) = com1(ncha1,2) + lseg/2.0
+
+! Cara de ADELANTE
+
+x(1) = c_cube(1) + l_cube/2.0
+x(2)= c_cube(2) - l_cube/2.0 + float(ix)*sep - sep/2.0
+x(3) = c_cube(3) - l_cube/2.0 + float(iy)*sep - sep/2.0
+
+do j = 1,3
+    js(j) = floor(x(j)/delta)+1
+enddo
+jx = js(1)
+jy = js(2)
+jz = js(3)
+
+! increase counter
+ ncha1 = ncha1 + 1
+
+ indexvolx(jx,jy,jz) = ncha1
+ p1(ncha1,1)=jx
+ p1(ncha1,2)=jy
+ p1(ncha1,3)=jz
+
+volxx1(jx,jy,jz) =  volxx1(jx,jy,jz) + 1.0
+volx1(indexvolx(jx,jy,jz)) = volx1(indexvolx(jx,jy,jz)) + 1.0
+sumvolx1 = sumvolx1 + 1.0
+com1(ncha1,:) = x(:)
+com1(ncha1,1) = com1(ncha1,1) + lseg/2.0
+
+enddo
+enddo
+
+endif
 
 end subroutine
