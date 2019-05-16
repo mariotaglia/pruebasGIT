@@ -298,8 +298,6 @@ dims(1) = dimx
 dims(2) = dimy
 dims(3) = dimz
 
-sep = l_cube/float(l_pol)
-
 indexvolx = 0
 ncha1 = 0
 volx1 = 0.0
@@ -308,10 +306,12 @@ com1 = 0.0
 p1 = 0
 volxx1 = 0.0
 
-! This routine determines the surface coverage and grafting positions only for cylinder
+! This routine determines the surface coverage and grafting positions only for cube
 !
 
 if (cubeR.eq.0) then
+
+sep = l_cube/float(l_pol)
 
 do ix =1,l_pol
 do iy = 1,l_pol
@@ -485,6 +485,8 @@ endif
 
 if (cubeR.eq.1) then
 
+sep = l_cube/float(l_pol)
+
 do ix =1,l_pol
 do iy = 1,l_pol
 
@@ -556,6 +558,111 @@ jy = js(2)
 jz = js(3)
 
 ! increase counter
+ ncha1 = ncha1 + 1
+
+ indexvolx(jx,jy,jz) = ncha1
+ p1(ncha1,1)=jx
+ p1(ncha1,2)=jy
+ p1(ncha1,3)=jz
+
+volxx1(jx,jy,jz) =  volxx1(jx,jy,jz) + 1.0
+volx1(indexvolx(jx,jy,jz)) = volx1(indexvolx(jx,jy,jz)) + 1.0
+sumvolx1 = sumvolx1 + 1.0
+com1(ncha1,:) = x(:)
+com1(ncha1,1) = com1(ncha1,1) + lseg/2.0
+
+enddo
+enddo
+
+endif
+
+if (cubeR.eq.2) then
+
+sep = 2.0*(l_cube/((l_pol*2.0)-1.0))
+
+! Cara de ARRIBA
+
+do ix =1,l_pol
+do iy = 1,l_pol
+
+x(1) = c_cube(1) - l_cube/2.0 + float(ix)*sep - sep/2.0
+x(2)= c_cube(2) - l_cube/2.0 + float(iy)*sep - sep/2.0
+x(3) = c_cube(3) + l_cube/2.0
+
+do j = 1,3
+    js(j) = floor(x(j)/delta)+1
+enddo
+jx = js(1)
+jy = js(2)
+jz = js(3)
+
+! increase counter
+ ncha1 = ncha1 + 1
+
+ indexvolx(jx,jy,jz) = ncha1
+ p1(ncha1,1)=jx
+ p1(ncha1,2)=jy
+ p1(ncha1,3)=jz
+
+volxx1(jx,jy,jz) =  volxx1(jx,jy,jz) + 1.0
+volx1(indexvolx(jx,jy,jz)) = volx1(indexvolx(jx,jy,jz)) + 1.0
+sumvolx1 = sumvolx1 + 1.0
+com1(ncha1,:) = x(:)
+com1(ncha1,3) = com1(ncha1,3) + lseg/2.0
+
+enddo
+enddo
+
+!Cara de DERECHA zx
+
+do ix =1,l_pol
+do iy = 1,l_pol - 1
+
+x(1) = c_cube(1) - l_cube/2.0 + float(ix)*sep - sep/2.0
+x(2)= c_cube(2) + l_cube/2.0
+x(3) = c_cube(3) - l_cube/2.0 + float(iy)*sep - sep/2.0
+
+do j = 1,3
+    js(j) = floor(x(j)/delta)+1
+enddo
+jx = js(1)
+jy = js(2)
+jz = js(3)
+
+!increase counter
+ ncha1 = ncha1 + 1
+
+ indexvolx(jx,jy,jz) = ncha1
+ p1(ncha1,1)=jx
+ p1(ncha1,2)=jy
+ p1(ncha1,3)=jz
+
+volxx1(jx,jy,jz) =  volxx1(jx,jy,jz) + 1.0
+volx1(indexvolx(jx,jy,jz)) = volx1(indexvolx(jx,jy,jz)) + 1.0
+sumvolx1 = sumvolx1 + 1.0
+com1(ncha1,:) = x(:)
+com1(ncha1,2) = com1(ncha1,2) + lseg/2.0
+
+enddo
+enddo
+
+! Cara de ADELANTE
+
+do ix =1,l_pol - 1
+do iy = 1,l_pol - 1
+
+x(1) = c_cube(1) + l_cube/2.0
+x(2)= c_cube(2) - l_cube/2.0 + float(ix)*sep - sep/2.0
+x(3) = c_cube(3) - l_cube/2.0 + float(iy)*sep - sep/2.0
+
+do j = 1,3
+    js(j) = floor(x(j)/delta)+1
+enddo
+jx = js(1)
+jy = js(2)
+jz = js(3)
+
+!increase counter
  ncha1 = ncha1 + 1
 
  indexvolx(jx,jy,jz) = ncha1
