@@ -3,7 +3,7 @@ subroutine puntas
 use cube
 use system
 use mmask
-
+use kaist
 implicit none
 integer i,j,k
 integer nx, ny, nz
