@@ -248,9 +248,10 @@ endif
 
   write(filename,'(A7, I3.3, A4)')'system.', cccc, '.dat'
   open (unit=310, file=filename)
-  write(310,*)'st          = ',st ! residual size of iteration vector
+  write(310,*)'st          = ',st
+  write(310,*)'kp          = ',kp
   write(310,*)'fnorm       = ',norma ! residual size of iteration vector
-  write(310,*)'length seg  = ',0.35 ! value see subroutine cadenas
+  write(310,*)'length seg  = ', lseg ! value see subroutine cadenas
   write(310,*)'delta       = ',delta
   write(310,*)'vsol        = ',vsol
   write(310,*)'vsalt       = ',vsalt*vsol
