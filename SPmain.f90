@@ -133,11 +133,11 @@ kp = 1.0d10+kps(1)
 do i = 1, nkp
  do while (kp.ne.kps(i))
   kp = kps(i)
-  call puntas
   if(rank.eq.0)write(stdout,*)'Switch to kp = ', kp
   flagcrash = 1
   do while(flagcrash.eq.1)
    flagcrash = 0
+   if(systemtype.eq.7)call puntas
    call solve(flagcrash)
    if(flagcrash.eq.1) then
     if(i.eq.1)stop
@@ -162,7 +162,7 @@ enddo
 
 case (2)
 
-kp = 0
+kp = kps(1)
 st = 1.0d10+sts(1)
 do i = 1, nst
  do while (st.ne.sts(i))
@@ -171,6 +171,7 @@ do i = 1, nst
   flagcrash = 1
   do while(flagcrash.eq.1)
    flagcrash = 0
+   if(systemtype.eq.7)call puntas
    call solve(flagcrash)
    if(flagcrash.eq.1) then
     if(i.eq.1)stop

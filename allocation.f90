@@ -12,7 +12,11 @@ use ellipsoid
 use MPI
 use kai
 use mparameters_monomer
+use mmask
 implicit none
+
+
+allocate(mask(dimx,dimy,dimz))
 
 ! fields_fkfun
 !ALLOCATE(xtotal(1-Xulimit:dimx+Xulimit, 1-Xulimit:dimy+Xulimit, 1-Xulimit:dimz+Xulimit)) ! xtotal para poor solvent

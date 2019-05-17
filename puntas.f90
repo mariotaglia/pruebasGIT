@@ -15,7 +15,6 @@ real*8 sigma
 integer counter
 character*5 title
 real*8, parameter :: pi  = 4 * atan(1.0_8) 
-allocate(mask(dimx,dimy,dimz))
 
 ! Vértices del cubo
 
