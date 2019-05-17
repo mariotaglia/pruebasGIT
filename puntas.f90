@@ -32,7 +32,7 @@ vertices(1,:) = (/c_cube(1) + l_cube/2.0,c_cube(2) + l_cube/2.0,c_cube(3) + l_cu
 
 allocate(vert_test(1,3)) !Número de centros de las gaussianas, 3
 vert_test = vertices
-sigma = delta
+sigma = kp
 
 ! Matriz con las posiciones de cada celdilla del array y la gaussiana
 
@@ -64,7 +64,7 @@ do ii = 1,size(points,1)
  xx = (X(1) - points(ii,1))**2
  yy = (X(2) - points(ii,2))**2
  zz = (X(3) - points(ii,3))**2
- gauss_interact = gauss_interact + (1.0/(sigma*(2.0*pi)**(0.5))**3)*dexp(-(1.0/2.0*sigma**2)*(xx**2 + yy**2 + zz**2))
+ gauss_interact = gauss_interact + dexp(-(1.0/2.0*sigma**2)*(xx**2 + yy**2 + zz**2))
 end do
 
 end function

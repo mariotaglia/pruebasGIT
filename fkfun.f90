@@ -244,12 +244,8 @@ do ix=1,dimx
     !  hfactor = dexp(-(kp**2)*hd)
 
      !end if
-     if(vscan.eq.2) hfactor = 1.0
 
-     if(vscan.eq.1) then
-       hfactor = mask(ix,iy,iz)*kp
-       if(hfactor.gt.1) hfactor = 1.0
-     endif
+     hfactor = mask(ix,iy,iz)
 
      fv = (1.0 - volprot(ix,iy,iz))
      xpot(ix, iy, iz, im) = xh(ix,iy,iz)**vpol

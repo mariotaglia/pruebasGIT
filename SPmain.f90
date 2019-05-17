@@ -91,7 +91,6 @@ elseif (systemtype.eq.60) then
 call update_matrix_60(flag) ! channel + particles
 elseif (systemtype.eq.7) then ! cube
 call update_matrix_cube(flag) ! updates 'the matrix'
-call puntas
 endif
 
   if(flag.eqv..true.) then
@@ -134,6 +133,7 @@ kp = 1.0d10+kps(1)
 do i = 1, nkp
  do while (kp.ne.kps(i))
   kp = kps(i)
+  call puntas
   if(rank.eq.0)write(stdout,*)'Switch to kp = ', kp
   flagcrash = 1
   do while(flagcrash.eq.1)
