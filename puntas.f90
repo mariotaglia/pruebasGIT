@@ -1,4 +1,4 @@
-subroutine puntas
+subroutine puntas(counter)
 
 use cube
 use system
@@ -45,9 +45,7 @@ do i = 1,dimx
 enddo
 
 title = 'punta'
-counter = 1
-call savetodisk(mask, title, counter)
-
+!call savetodisk(mask, title, counter)
 
 contains
 
@@ -59,11 +57,14 @@ real*8 sigma, xx, yy, zz
 
 gauss_interact = 0.0
 
+
 do ii = 1,size(points,1)
- xx = (X(1) - points(ii,1))**2
- yy = (X(2) - points(ii,2))**2
- zz = (X(3) - points(ii,3))**2
- gauss_interact = gauss_interact + dexp(-(1.0/2.0*sigma**2)*(xx**2 + yy**2 + zz**2))
+
+
+ xx = (X(1) - points(ii,1))
+ yy = (X(2) - points(ii,2))
+ zz = (X(3) - points(ii,3))
+ gauss_interact = gauss_interact + dexp(-(1.0/(2.0*sigma**2))*(xx**2 + yy**2 + zz**2))
 end do
 
 end function

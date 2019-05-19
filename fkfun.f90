@@ -247,6 +247,8 @@ do ix=1,dimx
 
      hfactor = mask(ix,iy,iz)
 
+     if(kp.eq.0.0)hfactor = 1.0
+
      fv = (1.0 - volprot(ix,iy,iz))
      xpot(ix, iy, iz, im) = xh(ix,iy,iz)**vpol
      xpot(ix, iy, iz, im) = xpot(ix,iy,iz, im)*dexp(voleps(ix,iy,iz))
