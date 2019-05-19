@@ -196,6 +196,8 @@ enddo
 
 ! Compute dielectric permitivity
 
+xtotal(:,:,:,1)=1.0-xh(:,:,:)-xpos(:,:,:)-xneg(:,:,:)-xHplus(:,:,:)-xOHmin(:,:,:)
+
 xtotalsum = 0.0 ! sum of all polymers
 do ip = 1, N_poorsol
 xtotalsum(:,:,:) = xtotalsum(:,:,:) + xtotal(:,:,:,ip)
@@ -457,15 +459,17 @@ do ix=1,dimx
 do iy=1,dimy
 do iz=1,dimz
 
-do ip = 1, N_poorsol
-  f(ix+dimx*(iy-1)+dimx*dimy*(iz-1)+ip*ncells) = xtotal(ix,iy,iz,ip)
+!do ip = 1, N_poorsol
+!  f(ix+dimx*(iy-1)+dimx*dimy*(iz-1)+ip*ncells) = xtotal(ix,iy,iz,ip)
 
-  do im = 1, N_monomer
-   if(hydroph(im).eq.ip) then 
-    f(ix+dimx*(iy-1)+dimx*dimy*(iz-1)+ip*ncells) = f(ix+dimx*(iy-1)+dimx*dimy*(iz-1)+ip*ncells) - avpol(ix,iy,iz,im)
-   endif
-  enddo ! im
-enddo ! ip
+!  do im = 1, N_monomer
+!   if(hydroph(im).eq.ip) then 
+!    f(ix+dimx*(iy-1)+dimx*dimy*(iz-1)+ip*ncells) = f(ix+dimx*(iy-1)+dimx*dimy*(iz-1)+ip*ncells) - avpol(ix,iy,iz,im)
+!   endif
+!  enddo ! im
+!enddo ! ip
+
+  f(ix+dimx*(iy-1)+dimx*dimy*(iz-1)+1*ncells) = 0.0
 
 enddo ! ix
 enddo ! iy
