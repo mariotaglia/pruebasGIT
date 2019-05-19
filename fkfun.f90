@@ -276,8 +276,6 @@ do ix=1,dimx
 
 ! Poor solvent
 
-     if(hydroph(im).ne.0) then
-
      protemp=0.0
 
      do ax = -Xulimit,Xulimit 
@@ -338,8 +336,6 @@ do ix=1,dimx
      enddo
 
      xpot(ix,iy,iz,im) =xpot(ix,iy,iz,im)*dexp(protemp)
-
-     endif ! hydrph
 
    enddo ! ix
   enddo ! iy
