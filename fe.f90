@@ -399,8 +399,8 @@ endif
             if((jz.ge.1).and.(jz.le.dimz)) then
                 fv2 = (1.0-volprot(jx,jy,jz)) 
 
-            do ip = 1, N_poorsol
-            do ipp = 1, N_poorsol
+            do ip = 0, N_poorsol
+            do ipp = 0, N_poorsol
  
                 F_vdW = F_vdW - 0.5000*delta**3*xtotal(ix,iy,iz,ip) &
         *xtotal(jx,jy,jz,ipp)*Xu(ax, ay, az)*st*st_matrix(ip,ipp)*fv*fv2/(vpol*vpol*vsol*vsol)
@@ -467,7 +467,7 @@ endif
       Free_Energy2 = 0.0
 
       xtotalsum = 0.0
-      do ip = 1, N_poorsol
+      do ip = 0, N_poorsol
       xtotalsum(:,:,:)= xtotalsum(:,:,:)+xtotal(:,:,:,ip)
       enddo
 
