@@ -108,7 +108,7 @@ enddo
 
 title = 'avpro'
 counter = 1
-!call savetodisk(volprot, title, counter)
+call savetodisk(volprot, title, counter)
 
 sumpolseg = ncha
 
@@ -136,7 +136,7 @@ counter = 1
 
 title = 'avgrf'
 counter = 1
-!call savetodisk(volxx, title, counter)
+call savetodisk(volxx, title, counter)
 
 end subroutine
 

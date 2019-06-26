@@ -27,6 +27,18 @@ vertices(1,:) = (/c_cube(1) + l_cube/2.0,c_cube(2) + l_cube/2.0,c_cube(3) + l_cu
 !vertices(7,:) = (/c_cube(1) - l_cube/2.0,c_cube(2) + l_cube/2.0,c_cube(3) - l_cube/2.0/)
 !vertices(8,:) = (/c_cube(1) - l_cube/2.0,c_cube(2) - l_cube/2.0,c_cube(3) - l_cube/2.0/)
 
+!Caras del cubo (octavo)
+
+!vertices(1,:) = (/c_cube(1) - l_cube/2.0,c_cube(2) - l_cube/2.0,c_cube(3) + l_cube/2.0/)
+!vertices(2,:) = (/c_cube(1) + l_cube/2.0,c_cube(2) - l_cube/2.0,c_cube(3) - l_cube/2.0/)
+!vertices(3,:) = (/c_cube(1) - l_cube/2.0,c_cube(2) + l_cube/2.0,c_cube(3) - l_cube/2.0/)
+
+!Aristas del cubo (octavo)
+
+!vertices(1,:) = (/c_cube(1) - l_cube/2.0,c_cube(2) + l_cube/2.0,c_cube(3) + l_cube/2.0/)
+!vertices(2,:) = (/c_cube(1) + l_cube/2.0,c_cube(2) - l_cube/2.0,c_cube(3) + l_cube/2.0/)
+!vertices(3,:) = (/c_cube(1) + l_cube/2.0,c_cube(2) + l_cube/2.0,c_cube(3) - l_cube/2.0/)
+
 ! testeo con un punto arbitrario
 
 allocate(vert_test(1,3)) !Número de centros de las gaussianas, 3
@@ -45,7 +57,7 @@ do i = 1,dimx
 enddo
 
 title = 'punta'
-!call savetodisk(mask, title, counter)
+call savetodisk(mask, title, counter)
 
 contains
 
