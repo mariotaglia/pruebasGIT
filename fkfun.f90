@@ -44,7 +44,8 @@ real*8 avpol_temp(dimx,dimy,dimz)
 real*8 q_tosend, sumgauche_tosend
 real*8 gradpsi2
 real*8 fv
-
+real*8 histoe2e_tosend(nhist)
+real*8 histoe2e_temp(nhist)
 !-----------------------------------------------------
 ! Common variables
 
@@ -156,6 +157,8 @@ case(2)
 endselect
 
 ! volume fraction and frdir
+
+histoe2e = 0.0
 
 do ix=1,dimx
  do iy=1,dimy
@@ -277,9 +280,12 @@ enddo
 avpol_tosend = 0.0
 q = 0.0
 sumgauche = 0.0
+histoe2e_tosend = 0.0
 
 do jj = 1, cpp(rank+1)
    ii = cppini(rank+1)+jj
+
+   histoe2e_temp = 0.0
 
    q_tosend=0.0
    sumgauche_tosend = 0.0
@@ -301,6 +307,9 @@ do jj = 1, cpp(rank+1)
     ngpol(ii)*sc ! ngpol(ii) has the number of chains grafted to the point ii
    enddo
 
+   histoe2e_temp(e2e(i,ii)) = histoe2e_temp(e2e(i,ii)) + pro(i, jj)*ngpol(ii)
+
+
    q_tosend=q_tosend+pro(i, jj)
    sumgauche_tosend = sumgauche_tosend+ngauche(i, ii)*pro(i,jj)
 
@@ -315,9 +324,18 @@ do jj = 1, cpp(rank+1)
  enddo
 q(ii) = q_tosend ! no la envia ahora
 sumgauche(ii) = sumgauche_tosend/q_tosend
+histoe2e_tosend = histoe2e_tosend + histoe2e_temp/q_tosend
 
 !print*, rank+1,jj,ii,q(ii)
 enddo ! jj
+
+!if(rank.eq.0) then
+!do i = 1, 100
+!print*, i, pro(i,1), pro(i,100), e2e(i,1), e2e(i,100)
+!enddo
+!stop
+!endif
+
 
 !------------------ MPI ----------------------------------------------
 !1. Todos al jefe
@@ -329,11 +347,13 @@ call MPI_Barrier(MPI_COMM_WORLD, err)
 if (rank.eq.0) then
 ! Junta avpol       
   call MPI_REDUCE(avpol_tosend, avpol, dimx*dimy*dimz, MPI_DOUBLE_PRECISION, MPI_SUM,0, MPI_COMM_WORLD, err)
+  call MPI_REDUCE(histoe2e_tosend, histoe2e, nhist, MPI_DOUBLE_PRECISION, MPI_SUM,0, MPI_COMM_WORLD, err)
 endif
 ! Subordinados
 if(rank.ne.0) then
 ! Junta avpol       
   call MPI_REDUCE(avpol_tosend, avpol, dimx*dimy*dimz, MPI_DOUBLE_PRECISION, MPI_SUM,0, MPI_COMM_WORLD, err) 
+  call MPI_REDUCE(histoe2e_tosend, histoe2e, nhist, MPI_DOUBLE_PRECISION, MPI_SUM,0, MPI_COMM_WORLD, err)
 !!!!!!!!!!! IMPORTANTE, LOS SUBORDINADOS TERMINAN ACA... SINO VER !MPI_allreduce!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
   goto 3333
 endif

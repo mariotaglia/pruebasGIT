@@ -5,6 +5,7 @@ use const
 use system
 use chainsdat
 use MPI
+use conformations
 implicit none
 integer i,il,ll
 integer j
@@ -14,6 +15,7 @@ real*8 altx,alty,altz,x(200),y(200),xp(200),yp(200)
 real*8 theta,theta1
 integer iglobal
 integer nchas
+real*8 tempe2e
 
 newcuantas = 0
 
@@ -53,6 +55,18 @@ do while (il.lt.cuantas)
       il=il+1
       if(il.gt.cuantas) goto 100
       ing = gauches(i)
+
+      tempe2e = (chains(1,1,i)-chains(1,long,i))**2
+      tempe2e = tempe2e + (chains(2,1,i)-chains(2,long,i))**2
+      tempe2e = tempe2e + (chains(3,1,i)-chains(3,long,i))**2
+      tempe2e = sqrt(tempe2e)
+
+      e2eg = int(tempe2e/maxe2e*float(nhist))+1
+      if(e2eg.gt.100) then
+            print*, 'error e2eg'
+            stop
+      endif
+
       do j=1,long
          in1(j,2)=chains(2,j,i)
          in1(j,3)=chains(3,j,i)

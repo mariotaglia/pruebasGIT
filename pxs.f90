@@ -58,6 +58,7 @@ do jj = 1, cpp(rank+1)
 
     newcuantas(ii) = newcuantas(ii)+1
     ngauche(newcuantas(ii),ii) = ing
+    e2e(newcuantas(ii),ii) = e2eg
 
             do j = 1, long
             aa = floor(pxtemp(1,j)/delta) + 1

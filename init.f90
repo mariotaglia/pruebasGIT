@@ -136,6 +136,7 @@ use fields_fkfun
 use MPI
 use kinsol
 use kaist
+use conformations
 implicit none
 integer cccc
 character*20 filename
@@ -148,6 +149,28 @@ integer ix,iy,iz
 !----------------------------------------------------------
 
 if(rank.eq.0) then ! solo el jefe escribe a disco....
+
+
+do ix = 1, nhist
+print*, ix, histoe2e(ix)
+enddo
+
+
+
+open(file='e2e.dat', unit=333)
+do ix = 1, nhist
+write(333,*)ix, histoe2e(ix)
+enddo
+close(333)
+
+
+
+
+
+
+
+
+
   ! Guarda infile
 !  write(filename,'(A4, I3.3, A4)')'out.', cccc, '.dat'
 !  open(unit=45, file=filename)

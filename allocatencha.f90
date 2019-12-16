@@ -10,6 +10,7 @@ implicit none
 ALLOCATE(q(ncha))
 ALLOCATE(sumgauche(ncha))
 ALLOCATE(ngauche(cuantas,ncha))
+ALLOCATE(e2e(cuantas,ncha))
 
 ! chainsdat
 allocate(posicion(ncha,3))
