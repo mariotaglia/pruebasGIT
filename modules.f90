@@ -93,9 +93,9 @@ integer*1, allocatable :: py(:,:,:)
 integer*1, allocatable :: pz(:,:,:)
 integer*1, allocatable :: ngauche(:,:)
 integer*1, allocatable :: e2e(:,:)
-integer, parameter :: nhist = 50
+integer, parameter :: nhist = 100
 real*8 histoe2e(nhist)
-real*8, parameter :: maxe2e = 2.0 ! maximum e2e in nm
+real*8, parameter :: maxe2e = 4.0 ! maximum e2e in nm
 endmodule
 
 module MPI

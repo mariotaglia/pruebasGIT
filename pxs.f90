@@ -63,10 +63,10 @@ do jj = 1, cpp(rank+1)
        x(3) = in1(long, 1)
        x = x + posicion(ii,:) - Rell(:,1)
 
-    e2e(newcuantas(ii),ii) = sqrt(x(1)**2+x(2)**2+x(3)**2)
 
     newcuantas(ii) = newcuantas(ii)+1
     ngauche(newcuantas(ii),ii) = ing
+    e2e(newcuantas(ii),ii) = int(sqrt(x(1)**2+x(2)**2+x(3)**2)/maxe2e*float(nhist))+1
 
             do j = 1, long
             aa = floor(pxtemp(1,j)/delta) + 1
