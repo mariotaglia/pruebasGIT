@@ -9,6 +9,7 @@ use chainsdat
 use conformations
 use const
 use transform
+use ellipsoid
 implicit none
     
 integer j, ii, jj,i
@@ -37,6 +38,7 @@ do jj = 1, cpp(rank+1)
        x(3) = in1(j, 1)
 
        x = x + posicion(ii,:)
+ 
        v = MATMUL(MAT,x)
        pxtemp(:,j) = v(:)
 
@@ -56,9 +58,15 @@ do jj = 1, cpp(rank+1)
 
     if(flag.eq.0) then
 
+       x(1) = in1(long ,2)
+       x(2) = in1(long, 3)
+       x(3) = in1(long, 1)
+       x = x + posicion(ii,:) - Rell(:,1)
+
+    e2e(newcuantas(ii),ii) = sqrt(x(1)**2+x(2)**2+x(3)**2)
+
     newcuantas(ii) = newcuantas(ii)+1
     ngauche(newcuantas(ii),ii) = ing
-    e2e(newcuantas(ii),ii) = e2eg
 
             do j = 1, long
             aa = floor(pxtemp(1,j)/delta) + 1
