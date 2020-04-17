@@ -1,4 +1,4 @@
-subroutine fkfun(x,f,ier2)
+Holasubroutine fkfun(x,f,ier2)
 
 use system
 use chainsdat
